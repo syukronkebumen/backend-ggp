@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\API\Master;
 
 use App\Http\Controllers\Controller;
-use App\Models\MasterSbin;
+use App\Models\MasterAdjustmentCategory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class MasterSbinController extends Controller
+class MasterAdjustmentCategoryController extends Controller
 {
     public function __construct()
     {
@@ -20,19 +20,11 @@ class MasterSbinController extends Controller
     public function index()
     {
         try {
-            $data = MasterSbin::select(
-                'master_storage_bin.id',
-                'master_storage_bin.s_bin',
-                'master_storage_location.s_loc',
-                'master_storage_location.description',
-                'master_storage_location.plant',
-                'master_storage_bin.created_at'
-            )->leftjoin('master_storage_location','master_storage_location.id','=','master_storage_bin.s_loc')
-            ->latest()->paginate(10);
+            $data = MasterAdjustmentCategory::latest()->paginate(10);
             return response()->json([
                 'success' => true,
                 'data' => $data,
-                'message' => 'Berhasil get data'
+                'message' => 'Berhasil get data cost center'
             ]); 
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -54,10 +46,7 @@ class MasterSbinController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                's_bin' => 'required',
-                's_loc' => 'required',
-                's_loc_description' => 'required',
-                'plant' => 'required',
+                'name' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -67,17 +56,14 @@ class MasterSbinController extends Controller
                     'message' => $validator->errors()
                 ]);
             }
-            $data = MasterSbin::create([
-                's_bin' => $request->s_bin,
-                's_loc' => $request->s_loc,
-                's_loc_description' => $request->s_loc_description,
-                'plant' => $request->plant
+            $data = MasterAdjustmentCategory::create([
+                'name' => $request->name
             ]);
 
             return response()->json([
                 'success' => true,
                 'data' => $data,
-                'message' => 'Berhasil create data'
+                'message' => 'Berhasil create data cost center'
             ]); 
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -107,10 +93,7 @@ class MasterSbinController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                's_bin' => 'required',
-                's_loc' => 'required',
-                's_loc_description' => 'required',
-                'plant' => 'required'
+                'name' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -121,7 +104,7 @@ class MasterSbinController extends Controller
                 ]);
             }
             $where = ['id' => $id];
-            $collection = MasterSbin::where($where)->first();
+            $collection = MasterAdjustmentCategory::where($where)->first();
             if (!$collection) {
                 return response()->json([
                     'success' => false,
@@ -129,17 +112,14 @@ class MasterSbinController extends Controller
                     'message' => 'ID tidak ditemukan'
                 ]);
             }
-            $data = MasterSbin::where($where)->update([
-                's_bin' => $request->s_bin,
-                's_loc' => $request->s_loc,
-                's_loc_description' => $request->s_loc_description,
-                'plant' => $request->plant
+            $data = MasterAdjustmentCategory::where($where)->update([
+                'name' => $request->name
             ]);
 
             return response()->json([
                 'success' => true,
                 'data' => $data,
-                'message' => 'Berhasil update data'
+                'message' => 'Berhasil update data cost center'
             ]); 
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -153,7 +133,7 @@ class MasterSbinController extends Controller
     {
         try {
             $where = ['id' => $id];
-            $collection = MasterSbin::where($where)->first();
+            $collection = MasterAdjustmentCategory::where($where)->first();
             if (!$collection) {
                 return response()->json([
                     'success' => false,
@@ -161,13 +141,13 @@ class MasterSbinController extends Controller
                     'message' => 'ID tidak ditemukan'
                 ]);
             }
-            $data = MasterSbin::find($id);
+            $data = MasterAdjustmentCategory::find($id);
             $data->delete();
 
             return response()->json([
                 'success' => true,
                 'data' => $data,
-                'message' => 'Berhasil delete data'
+                'message' => 'Berhasil delete data cost center'
             ]); 
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\Master\MasterAdjustmentCategoryController;
 use App\Http\Controllers\API\Master\MasterCostCenterController;
 use App\Http\Controllers\API\Master\MasterDepartementController;
 use App\Http\Controllers\API\Master\MasterGoodRecipientController;
@@ -93,4 +94,11 @@ Route::group([
     'prefix' => 'sbin' 
 ], function () {
     Route::resource('master_storage_bin', MasterSbinController::class);
+});
+
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'adjustment_category' 
+], function () {
+    Route::resource('master_adjustment_category', MasterAdjustmentCategoryController::class);
 });
