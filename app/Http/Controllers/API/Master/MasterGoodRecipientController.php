@@ -21,8 +21,10 @@ class MasterGoodRecipientController extends Controller
     {
         try {
             $data = MasterGoodRecipient::select(
+                'master_good_recipient.id',
                 'master_good_recipient.code',
                 'master_good_recipient.description',
+                'master_departement.id as departement_id',
                 'master_departement.departement',
                 'master_good_recipient.created_at',
             )->leftjoin('master_departement','master_departement.id','=','master_good_recipient.departement')
@@ -164,7 +166,7 @@ class MasterGoodRecipientController extends Controller
                 'master_good_recipient.created_at',
             )->leftjoin('master_departement','master_departement.id','=','master_good_recipient.departement')
             ->find($id);
-            $data->delete();
+            $collection->delete();
 
             return response()->json([
                 'success' => true,
