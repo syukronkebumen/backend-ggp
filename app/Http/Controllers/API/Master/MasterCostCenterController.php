@@ -21,8 +21,10 @@ class MasterCostCenterController extends Controller
     {
         try {
             $data = MasterCostCenter::select(
+                'master_cost_center.id',
                 'master_cost_center.cost_center',
                 'master_cost_center.description',
+                'master_departement.id as departement_id',
                 'master_departement.departement',
                 'master_cost_center.created_at',
             )->leftjoin('master_departement','master_departement.id','=','master_cost_center.departement')
