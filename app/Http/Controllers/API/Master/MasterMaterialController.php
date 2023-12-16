@@ -20,7 +20,17 @@ class MasterMaterialController extends Controller
     public function index()
     {
         try {
-            $data = MasterMaterial::latest()->paginate(10);
+            $data = MasterMaterial::select(
+                'master_material.id',
+                'master_material.material_code',
+                'master_material.material_description',
+                'master_material.batch',
+                'master_material.plant',
+                'master_uom.id as uom_id',
+                'master_uom.name',
+                'master_material.created_at'
+            )->leftjoin('master_uom', 'master_uom.id','=','master_material.uom')
+            ->latest()->paginate(10);
             return response()->json([
                 'success' => true,
                 'data' => $data,
