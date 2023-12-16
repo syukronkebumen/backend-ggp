@@ -166,7 +166,7 @@ class MasterCostCenterController extends Controller
                 'master_cost_center.created_at',
             )->leftjoin('master_departement','master_departement.id','=','master_cost_center.departement')
             ->find($id);
-            $data->delete();
+            $collection->delete();
 
             return response()->json([
                 'success' => true,
