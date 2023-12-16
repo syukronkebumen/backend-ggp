@@ -23,6 +23,7 @@ class MasterSbinController extends Controller
             $data = MasterSbin::select(
                 'master_storage_bin.id',
                 'master_storage_bin.s_bin',
+                'master_storage_location.id as sloc_id',
                 'master_storage_location.s_loc',
                 'master_storage_location.description',
                 'master_storage_location.plant',
