@@ -28,6 +28,7 @@ class MasterSlocController extends Controller
                 'master_storage_location.inbound',
                 'master_storage_location.outbound',
                 'master_storage_location.batch',
+                'master_departement.id as departement_id',
                 'master_departement.departement',
                 'master_storage_location.created_at'
             )->leftjoin('master_departement','master_departement.id','=','master_storage_location.departement')
