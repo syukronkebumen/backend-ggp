@@ -21,7 +21,13 @@ class UserController extends Controller
     public function index()
     {
         try {
-            $data = User::latest()->paginate(10);
+            $data = User::select(
+                'users.*',
+                'master_storage_location.s_loc as name_sloc',
+                'master_departement.departement as name_departement'
+            )->leftjoin('master_storage_location','master_storage_location.id','=','users.sloc_id')
+            ->leftjoin('master_departement','master_departement.id','=','users.departement_id')
+            ->latest()->paginate(10);
             foreach ($data as $item) {
                 $data->roles = $item->getRoleNames();
             }
