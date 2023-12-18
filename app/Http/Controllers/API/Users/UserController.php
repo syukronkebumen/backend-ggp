@@ -109,7 +109,25 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $data = User::select(
+                'id',
+                'name',
+                'pob',
+                'dob',
+                'email',
+                'no_telp',
+                'address'
+            )->find($id);
+            $data->roles = $data->getRoleNames();
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]); 
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
