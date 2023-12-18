@@ -10,6 +10,8 @@ use App\Http\Controllers\API\Master\MasterMovementTypeController;
 use App\Http\Controllers\API\Master\MasterSbinController;
 use App\Http\Controllers\API\Master\MasterSlocController;
 use App\Http\Controllers\API\Master\MasterUomController;
+use App\Http\Controllers\API\Roles\RolesController;
+use App\Http\Controllers\API\Users\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -101,4 +103,17 @@ Route::group([
     'prefix' => 'adjustment_category' 
 ], function () {
     Route::resource('master_adjustment_category', MasterAdjustmentCategoryController::class);
+});
+
+Route::group([
+    'middleware' => 'api'
+], function () {
+    Route::resource('roles', RolesController::class);
+});
+
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'users' 
+], function () {
+    Route::resource('list_users', UserController::class);
 });
