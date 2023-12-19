@@ -10,6 +10,7 @@ use App\Http\Controllers\API\Master\MasterMovementTypeController;
 use App\Http\Controllers\API\Master\MasterSbinController;
 use App\Http\Controllers\API\Master\MasterSlocController;
 use App\Http\Controllers\API\Master\MasterUomController;
+use App\Http\Controllers\API\MaterialList\MaterialListController;
 use App\Http\Controllers\API\Permissions\PermissionsController;
 use App\Http\Controllers\API\Roles\RolesController;
 use App\Http\Controllers\API\Users\UserController;
@@ -123,4 +124,11 @@ Route::group([
     'middleware' => 'api',
 ], function () {
     Route::resource('permissions', PermissionsController::class);
+});
+
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'material' 
+], function () {
+    Route::resource('material_loc_default', MaterialListController::class);
 });
