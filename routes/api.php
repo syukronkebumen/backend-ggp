@@ -11,7 +11,9 @@ use App\Http\Controllers\API\Master\MasterSbinController;
 use App\Http\Controllers\API\Master\MasterSlocController;
 use App\Http\Controllers\API\Master\MasterUomController;
 use App\Http\Controllers\API\MaterialList\MaterialListController;
+use App\Http\Controllers\API\Outbound\OutboundController;
 use App\Http\Controllers\API\Permissions\PermissionsController;
+use App\Http\Controllers\API\Reference\ReferenceController;
 use App\Http\Controllers\API\Roles\RolesController;
 use App\Http\Controllers\API\Users\UserController;
 use Illuminate\Http\Request;
@@ -131,4 +133,18 @@ Route::group([
     'prefix' => 'material' 
 ], function () {
     Route::resource('material_loc_default', MaterialListController::class);
+});
+
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'reference' 
+], function () {
+    Route::resource('index', ReferenceController::class);
+});
+
+
+Route::group([
+    'middleware' => 'api',
+], function () {
+    Route::resource('outbound', OutboundController::class);
 });
