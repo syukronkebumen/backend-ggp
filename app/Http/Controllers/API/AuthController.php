@@ -75,6 +75,13 @@ class AuthController extends Controller
     {
         try {
             $user = Auth::user();
+            $selectDepartemnt = User::select(
+                'master_departement.departement as name_departement'
+            )->leftjoin('master_departement','master_departement.id','=','users.departement_id')
+            ->where('users.id', $user->id)
+            ->first();
+            $user->name_departement = $selectDepartemnt['name_departement'];
+            $user->roles = $user->getRoleNames();
             return response()->json([
                 'success' => true,
                 'data' => $user,
