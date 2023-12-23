@@ -17,10 +17,10 @@ class MasterMaterialController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = MasterMaterial::select(
+            $query = MasterMaterial::select(
                 'master_material.id',
                 'master_material.material_code',
                 'master_material.material_description',
@@ -29,8 +29,27 @@ class MasterMaterialController extends Controller
                 'master_uom.id as uom_id',
                 'master_uom.name',
                 'master_material.created_at'
-            )->leftjoin('master_uom', 'master_uom.id','=','master_material.uom')
-            ->latest()->paginate(10);
+            )->leftjoin('master_uom', 'master_uom.id','=','master_material.uom');
+
+            if ($request->has('search') && $request->input('search')) {
+                $searchTerm = $request->input('search');
+                $query->where('material_code', 'like', '%' . $searchTerm . '%');
+            }
+
+            if ($request->has('sortField') && $request->has('sortOrder')) {
+                $sortField = $request->input('sortField');
+                $sortOrder = $request->input('sortOrder');
+
+                $allowedFields = ['material_code'];
+                if (in_array($sortField, $allowedFields)) {
+                    $sortDirection = $sortOrder == 1 ? 'asc' : 'desc';
+                    $query->orderBy($sortField, $sortDirection);
+                }
+            } else {
+                $query->latest();
+            }   
+
+            $data = $query->paginate(10);
             return response()->json([
                 'success' => true,
                 'data' => $data,

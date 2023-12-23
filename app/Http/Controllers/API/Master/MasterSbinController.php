@@ -17,10 +17,10 @@ class MasterSbinController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = MasterSbin::select(
+            $query = MasterSbin::select(
                 'master_storage_bin.id',
                 'master_storage_bin.s_bin',
                 'master_storage_location.id as sloc_id',
@@ -28,8 +28,26 @@ class MasterSbinController extends Controller
                 'master_storage_location.description',
                 'master_storage_location.plant',
                 'master_storage_bin.created_at'
-            )->leftjoin('master_storage_location','master_storage_location.id','=','master_storage_bin.s_loc')
-            ->latest()->paginate(10);
+            )->leftjoin('master_storage_location','master_storage_location.id','=','master_storage_bin.s_loc');
+
+            if ($request->has('search') && $request->input('search')) {
+                $searchTerm = $request->input('search');
+                $query->where('s_bin', 'like', '%' . $searchTerm . '%');
+            }
+
+            if ($request->has('sortField') && $request->has('sortOrder')) {
+                $sortField = $request->input('sortField');
+                $sortOrder = $request->input('sortOrder');
+
+                $allowedFields = ['s_bin','s_loc'];
+                if (in_array($sortField, $allowedFields)) {
+                    $sortDirection = $sortOrder == 1 ? 'asc' : 'desc';
+                    $query->orderBy($sortField, $sortDirection);
+                }
+            } else {
+                $query->latest();
+            }
+            $data = $query->paginate(10);
             return response()->json([
                 'success' => true,
                 'data' => $data,

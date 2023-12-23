@@ -17,20 +17,37 @@ class MasterGoodRecipientController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = MasterGoodRecipient::select(
+            $query = MasterGoodRecipient::select(
                 'master_good_recipient.id',
                 'master_good_recipient.code',
                 'master_good_recipient.description',
                 'master_departement.id as departement_id',
                 'master_departement.departement',
                 'master_good_recipient.created_at',
-            )->leftjoin('master_departement','master_departement.id','=','master_good_recipient.departement')
-            ->latest()
-            ->orderBy('master_good_recipient.created_at','DESC')
-            ->paginate(10);
+            )->leftjoin('master_departement','master_departement.id','=','master_good_recipient.departement');
+
+            if ($request->has('search') && $request->input('search')) {
+                $searchTerm = $request->input('search');
+                $query->where('code', 'like', '%' . $searchTerm . '%');
+            }
+
+            if ($request->has('sortField') && $request->has('sortOrder')) {
+                $sortField = $request->input('sortField');
+                $sortOrder = $request->input('sortOrder');
+
+                $allowedFields = ['code'];
+                if (in_array($sortField, $allowedFields)) {
+                    $sortDirection = $sortOrder == 1 ? 'asc' : 'desc';
+                    $query->orderBy($sortField, $sortDirection);
+                }
+            } else {
+                $query->latest();
+            }    
+            
+            $data = $query->paginate(10);
             return response()->json([
                 'success' => true,
                 'data' => $data,

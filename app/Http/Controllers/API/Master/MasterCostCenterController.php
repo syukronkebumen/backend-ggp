@@ -17,20 +17,37 @@ class MasterCostCenterController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = MasterCostCenter::select(
+            $query = MasterCostCenter::select(
                 'master_cost_center.id',
                 'master_cost_center.cost_center',
                 'master_cost_center.description',
                 'master_departement.id as departement_id',
                 'master_departement.departement',
                 'master_cost_center.created_at',
-            )->leftjoin('master_departement','master_departement.id','=','master_cost_center.departement')
-            ->latest()
-            ->orderBy('master_cost_center.created_at','DESC')
-            ->paginate(10);
+            )->leftjoin('master_departement','master_departement.id','=','master_cost_center.departement');
+                
+            if ($request->has('search') && $request->input('search')) {
+                $searchTerm = $request->input('search');
+                $query->where('cost_center', 'like', '%' . $searchTerm . '%');
+            }
+
+            if ($request->has('sortField') && $request->has('sortOrder')) {
+                $sortField = $request->input('sortField');
+                $sortOrder = $request->input('sortOrder');
+
+                $allowedFields = ['cost_center'];
+                if (in_array($sortField, $allowedFields)) {
+                    $sortDirection = $sortOrder == 1 ? 'asc' : 'desc';
+                    $query->orderBy($sortField, $sortDirection);
+                }
+            } else {
+                $query->latest();
+            }
+
+            $data = $query->paginate(10);
             return response()->json([
                 'success' => true,
                 'data' => $data,

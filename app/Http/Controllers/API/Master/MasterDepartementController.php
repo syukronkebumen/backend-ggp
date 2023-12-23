@@ -17,10 +17,28 @@ class MasterDepartementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = MasterDepartement::latest()->paginate(10);
+            $query = MasterDepartement::latest();
+            if ($request->has('search') && $request->input('search')) {
+                $searchTerm = $request->input('search');
+                $query->where('departement', 'like', '%' . $searchTerm . '%');
+            }
+
+            if ($request->has('sortField') && $request->has('sortOrder')) {
+                $sortField = $request->input('sortField');
+                $sortOrder = $request->input('sortOrder');
+
+                $allowedFields = ['departement'];
+                if (in_array($sortField, $allowedFields)) {
+                    $sortDirection = $sortOrder == 1 ? 'asc' : 'desc';
+                    $query->orderBy($sortField, $sortDirection);
+                }
+            } else {
+                $query->latest();
+            }
+            $data = $query->paginate(10);
             return response()->json([
                 'success' => true,
                 'data' => $data,

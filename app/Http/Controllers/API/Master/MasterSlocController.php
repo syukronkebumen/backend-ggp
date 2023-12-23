@@ -17,10 +17,10 @@ class MasterSlocController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = MasterSloc::select(
+            $query = MasterSloc::select(
                 'master_storage_location.id',
                 'master_storage_location.s_loc',
                 'master_storage_location.description',
@@ -31,8 +31,26 @@ class MasterSlocController extends Controller
                 'master_departement.id as departement_id',
                 'master_departement.departement',
                 'master_storage_location.created_at'
-            )->leftjoin('master_departement','master_departement.id','=','master_storage_location.departement')
-            ->latest()->paginate(10);
+            )->leftjoin('master_departement','master_departement.id','=','master_storage_location.departement');
+            
+            if ($request->has('search') && $request->input('search')) {
+                $searchTerm = $request->input('search');
+                $query->where('s_loc', 'like', '%' . $searchTerm . '%');
+            }
+
+            if ($request->has('sortField') && $request->has('sortOrder')) {
+                $sortField = $request->input('sortField');
+                $sortOrder = $request->input('sortOrder');
+
+                $allowedFields = ['s_loc','departement'];
+                if (in_array($sortField, $allowedFields)) {
+                    $sortDirection = $sortOrder == 1 ? 'asc' : 'desc';
+                    $query->orderBy($sortField, $sortDirection);
+                }
+            } else {
+                $query->latest();
+            }
+            $data = $query->paginate(10);
             return response()->json([
                 'success' => true,
                 'data' => $data,
