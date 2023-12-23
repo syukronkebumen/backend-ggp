@@ -21,6 +21,7 @@ class OutboundController extends Controller
     {
         try {
             $query = Outbound::select(
+                'outbound.id',
                 'outbound.code',
                 'outbound.reference_doc',
                 'outbound.type',
@@ -115,7 +116,34 @@ class OutboundController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $data = Outbound::select(
+                'outbound.id',
+                'outbound.code',
+                'outbound.reference_doc',
+                'outbound.type',
+                'master_storage_location.s_loc',
+                'outbound.mvt_id',
+                'master_movement_type.mvt_code',
+                'master_good_recipient.description',
+                'outbound.receiving_sloc',
+                'outbound.status',
+                'reference.name',
+                'outbound.created_at'
+            )->leftjoin('master_movement_type','master_movement_type.id','=','outbound.mvt_id')
+            ->leftjoin('reference','reference.id','=','outbound.reference_doc')
+            ->leftjoin('master_storage_location','master_storage_location.id','=','reference.sloc_id')
+            ->leftjoin('master_good_recipient','master_good_recipient.id','=','reference.good_recipient_id')
+            ->find($id);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]); 
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
