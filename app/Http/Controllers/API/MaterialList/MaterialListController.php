@@ -17,10 +17,10 @@ class MaterialListController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = MaterialList::select(
+            $query = MaterialList::select(
                 'location_material_default.id',
                 'location_material_default.material_code as id_material_code',
                 'master_material.material_code',
@@ -36,8 +36,27 @@ class MaterialListController extends Controller
             )->leftjoin('master_material','master_material.id','=','location_material_default.material_code')
             ->leftjoin('master_uom','master_uom.id','=','master_material.uom')
             ->leftjoin('master_storage_bin','master_storage_bin.id','=','location_material_default.sbin_id')
-            ->leftjoin('master_storage_location','master_storage_location.id','=','master_storage_bin.s_loc')
-            ->latest()->paginate(20);
+            ->leftjoin('master_storage_location','master_storage_location.id','=','master_storage_bin.s_loc');
+            
+            if ($request->has('search') && $request->input('search')) {
+                $searchTerm = $request->input('search');
+                $query->where('master_material.material_code', 'like', '%' . $searchTerm . '%');
+            }
+
+            if ($request->has('sortField') && $request->has('sortOrder')) {
+                $sortField = $request->input('sortField');
+                $sortOrder = $request->input('sortOrder');
+
+                $allowedFields = ['material_code'];
+                if (in_array($sortField, $allowedFields)) {
+                    $sortDirection = $sortOrder == 1 ? 'asc' : 'desc';
+                    $query->orderBy($sortField, $sortDirection);
+                }
+            } else {
+                $query->latest();
+            }
+
+            $data = $query->paginate(20);
             return response()->json([
                 'success' => true,
                 'data' => $data,

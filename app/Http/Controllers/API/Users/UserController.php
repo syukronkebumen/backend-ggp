@@ -18,16 +18,36 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = User::select(
+            $query = User::select(
                 'users.*',
                 'master_storage_location.s_loc as name_sloc',
                 'master_departement.departement as name_departement'
             )->leftjoin('master_storage_location','master_storage_location.id','=','users.sloc_id')
-            ->leftjoin('master_departement','master_departement.id','=','users.departement_id')
-            ->latest()->paginate(10);
+            ->leftjoin('master_departement','master_departement.id','=','users.departement_id');
+            
+            if ($request->has('search') && $request->input('search')) {
+                $searchTerm = $request->input('search');
+                $query->where('name', 'like', '%' . $searchTerm . '%');
+                $query->orWhere('email', 'like', '%' . $searchTerm . '%');
+            }
+
+            if ($request->has('sortField') && $request->has('sortOrder')) {
+                $sortField = $request->input('sortField');
+                $sortOrder = $request->input('sortOrder');
+
+                $allowedFields = ['name','email'];
+                if (in_array($sortField, $allowedFields)) {
+                    $sortDirection = $sortOrder == 1 ? 'asc' : 'desc';
+                    $query->orderBy($sortField, $sortDirection);
+                }
+            } else {
+                $query->latest();
+            }
+
+            $data = $query->paginate(10);
             foreach ($data as $item) {
                 $data->roles = $item->getRoleNames();
             }
