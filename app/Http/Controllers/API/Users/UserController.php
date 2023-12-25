@@ -80,7 +80,8 @@ class UserController extends Controller
                 'email' => 'required|email|unique:users',
                 'sloc_id' => 'required',
                 'departement_id' => 'required',
-                'roles' => 'required'
+                'roles' => 'required',
+                'no_index' => 'numeric'
             ]);
 
             if ($validator->fails()) {
@@ -98,12 +99,9 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($fiksPassword),
-                'pob' => $request->pob,
-                'dob' => $request->dob,
-                'no_telp' => $request->no_telp,
-                'address' => $request->address,
                 'sloc_id' => $request->sloc_id,
-                'departement_id' => $request->departement_id
+                'departement_id' => $request->departement_id,
+                'no_index' => $request->no_index
             ]);
             if ($request->roles) {
                 $collectRoles = $request->roles;
@@ -133,11 +131,7 @@ class UserController extends Controller
             $data = User::select(
                 'id',
                 'name',
-                'pob',
-                'dob',
-                'email',
-                'no_telp',
-                'address'
+                'email'
             )->find($id);
             $data->roles = $data->getRoleNames();
             return response()->json([
@@ -192,10 +186,6 @@ class UserController extends Controller
             User::where('id', $id)->update([
                 'name' => $request->name,
                 'email' => $request->email,
-                'pob' => $request->pob,
-                'dob' => $request->dob,
-                'no_telp' => $request->no_telp,
-                'address' => $request->address,
                 'sloc_id' => $request->sloc_id,
                 'departement_id' => $request->departement_id
             ]);
