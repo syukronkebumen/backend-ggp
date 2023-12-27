@@ -23,12 +23,15 @@ class MasterSbinController extends Controller
             $query = MasterSbin::select(
                 'master_storage_bin.id',
                 'master_storage_bin.s_bin',
+                'master_storage_bin.departement_id',
+                'master_departement.departement as departement_name',
                 'master_storage_location.id as sloc_id',
                 'master_storage_location.s_loc',
                 'master_storage_location.description',
                 'master_storage_location.plant',
                 'master_storage_bin.created_at'
-            )->leftjoin('master_storage_location','master_storage_location.id','=','master_storage_bin.s_loc');
+            )->leftjoin('master_storage_location','master_storage_location.id','=','master_storage_bin.s_loc')
+            ->leftjoin('master_departement', 'master_departement.id','=','master_storage_bin.departement_id');
 
             if ($request->has('search') && $request->input('search')) {
                 $searchTerm = $request->input('search');
@@ -90,7 +93,8 @@ class MasterSbinController extends Controller
                 's_bin' => $request->s_bin,
                 's_loc' => $request->s_loc,
                 's_loc_description' => $request->s_loc_description,
-                'plant' => $request->plant
+                'plant' => $request->plant,
+                'departement_id' => auth()->user()->departement_id
             ]);
 
             return response()->json([

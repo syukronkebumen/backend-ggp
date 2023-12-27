@@ -13,6 +13,7 @@ class MasterSbin extends Model
         's_bin',
         's_loc',
         's_loc_description',
-        'plant'
+        'plant',
+        'departement_id'
     ];
 }

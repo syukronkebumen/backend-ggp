@@ -16,6 +16,6 @@ class MasterSloc extends Model
         'inbound',
         'outbound',
         'batch',
-        'departement'
+        'departement_id'
     ];
 }

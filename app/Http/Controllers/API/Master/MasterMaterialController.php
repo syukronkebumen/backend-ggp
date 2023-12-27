@@ -26,10 +26,13 @@ class MasterMaterialController extends Controller
                 'master_material.material_description',
                 'master_material.batch',
                 'master_material.plant',
+                'master_material.departement_id',
+                'master_departement.departement as departement_name',
                 'master_uom.id as uom_id',
                 'master_uom.name',
                 'master_material.created_at'
-            )->leftjoin('master_uom', 'master_uom.id','=','master_material.uom');
+            )->leftjoin('master_uom', 'master_uom.id','=','master_material.uom')
+            ->leftjoin('master_departement', 'master_departement.id','=','master_material.departement_id');
 
             if ($request->has('search') && $request->input('search')) {
                 $searchTerm = $request->input('search');
@@ -94,7 +97,8 @@ class MasterMaterialController extends Controller
                 'material_description' => $request->material_description,
                 'uom' => $request->uom,
                 'batch' => $request->batch,
-                'plant' => $request->plant
+                'plant' => $request->plant,
+                'departement_id' => auth()->user()->departement_id
             ]);
 
 

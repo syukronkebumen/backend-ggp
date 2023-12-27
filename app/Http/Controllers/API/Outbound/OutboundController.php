@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Outbound;
 
 use App\Http\Controllers\Controller;
 use App\Models\Outbound;
+use App\Models\Reference;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -32,9 +33,12 @@ class OutboundController extends Controller
                 'outbound.receiving_sloc',
                 'outbound.status',
                 'reference.name',
+                'outbound.departement_id',
+                'master_departement.departement as departement_name',
                 'outbound.created_at'
 
-            )->leftjoin('master_movement_type','master_movement_type.id','=','outbound.mvt_id')
+            )->leftjoin('master_departement','master_departement.id','=','outbound.departement_id')
+            ->leftjoin('master_movement_type','master_movement_type.id','=','outbound.mvt_id')
             ->leftjoin('reference','reference.id','=','outbound.reference_doc')
             ->leftjoin('master_storage_location','master_storage_location.id','=','reference.sloc_id')
             ->leftjoin('master_good_recipient','master_good_recipient.id','=','reference.good_recipient_id');
@@ -134,8 +138,21 @@ class OutboundController extends Controller
             ->leftjoin('reference','reference.id','=','outbound.reference_doc')
             ->leftjoin('master_storage_location','master_storage_location.id','=','reference.sloc_id')
             ->leftjoin('master_good_recipient','master_good_recipient.id','=','reference.good_recipient_id')
-            ->find($id);
             
+            ->find($id);
+            $dataRef = Reference::select(
+                'reference.name as reference_name',
+                'master_storage_location.s_loc as sloc_name',
+                'master_material.material_description',
+                'master_material.plant',
+                'master_material.uom',
+                'master_uom.name as uom_name',
+                'master_material.batch'
+            )->leftjoin('master_material','master_material.id','=','reference.material_id')
+            ->leftjoin('master_storage_location','master_storage_location.id','=','reference.sloc_id')
+            ->leftjoin('master_uom','master_uom.id','=','master_material.uom')
+            ->find($data->reference_doc);
+            $data['data_material'] = $dataRef;
             return response()->json([
                 'success' => true,
                 'data' => $data,

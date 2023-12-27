@@ -28,10 +28,10 @@ class MasterSlocController extends Controller
                 'master_storage_location.inbound',
                 'master_storage_location.outbound',
                 'master_storage_location.batch',
-                'master_departement.id as departement_id',
-                'master_departement.departement',
+                'master_storage_location.departement_id',
+                'master_departement.departement as departement_name',
                 'master_storage_location.created_at'
-            )->leftjoin('master_departement','master_departement.id','=','master_storage_location.departement');
+            )->leftjoin('master_departement','master_departement.id','=','master_storage_location.departement_id');
             
             if ($request->has('search') && $request->input('search')) {
                 $searchTerm = $request->input('search');
@@ -81,8 +81,7 @@ class MasterSlocController extends Controller
                 'plant' => 'required',
                 'inbound' => 'required',
                 'outbound' => 'required',
-                'batch' => 'required',
-                'departement' => 'required|integer'
+                'batch' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -99,7 +98,7 @@ class MasterSlocController extends Controller
                 'inbound' => $request->inbound,
                 'outbound' => $request->outbound,
                 'batch' => $request->batch,
-                'departement' => $request->departement
+                'departement_id' => auth()->user()->departement_id
             ]);
 
             return response()->json([
@@ -140,8 +139,7 @@ class MasterSlocController extends Controller
                 'plant' => 'required',
                 'inbound' => 'required',
                 'outbound' => 'required',
-                'batch' => 'required',
-                'departement' => 'required|integer'
+                'batch' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -166,8 +164,7 @@ class MasterSlocController extends Controller
                 'plant' => $request->plant,
                 'inbound' => $request->inbound,
                 'outbound' => $request->outbound,
-                'batch' => $request->batch,
-                'departement' => $request->departement
+                'batch' => $request->batch
             ]);
 
             return response()->json([

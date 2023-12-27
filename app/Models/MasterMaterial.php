@@ -15,6 +15,7 @@ class MasterMaterial extends Model
         'material_description',
         'uom',
         'batch',
-        'plant'
+        'plant',
+        'departement_id'
     ];
 }
